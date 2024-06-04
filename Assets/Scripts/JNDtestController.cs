@@ -4,9 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-
-
-public class VirtualSourceController : MonoBehaviour
+public class JNDtestController : MonoBehaviour
 {
     OSC osc;
     public Vector2 position1;

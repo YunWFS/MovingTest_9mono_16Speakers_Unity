@@ -4,28 +4,31 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-
-
-public class VirtualSourceController : MonoBehaviour
+public class SoundTestController : MonoBehaviour
 {
     OSC osc;
-    public Vector2 position1;
-    public Vector2 position2;
+    private Vector2 position1;
+    private Vector2 position2;
     public string mono1;
     public string mono2;
-    bool hasFirst = false;
-    bool hasSecond = false;
 
     public bool MoveingSource = false;
-    public bool StaticSource = false;
 
-    string[] sounds = new string[]{"BGM", "Bird"};
+    int[,] pathsIdx = new int[8, 2]{{ 3, 1}, { 6, 4}, { 7, 9}, 
+                                    { 1, 7}, { 8, 2}, { 9, 3},
+                                    { 1, 9}, { 7, 3}};
+    Vector2[,] pathsPos;
+    private int currPathIdx = 0; 
+    Vector2[] monosPos = new Vector2[10];    
+    string[] sounds = new string[]{"Bird", "BGM"};
     string soundName = "BGM";
 
     // public Vector3 MovingPosition;
 
     TextMeshProUGUI mText;
+    
     Button startBtn;
+    TextMeshProUGUI startBtnText;
     TMP_Dropdown m_Dropdown;
 
     GameObject MovingMono;
@@ -36,18 +39,18 @@ public class VirtualSourceController : MonoBehaviour
     void Start()
     {
         osc = GameObject.Find("Osc").GetComponent<OSC>();
-        moveTime = 5.0f;
-        hasFirst = false;
-        hasSecond = false;
+        moveTime = 1.0f;
         mono1 = "";
         mono2 = "";
         soundName = sounds[1];
-        // MovingPosition = new Vector3(0.0f, 0.0f, 0.0f);
+
         MovingMono = GameObject.Find("MovingMono");
         MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, 0.0f);
+        
         mText = GameObject.Find("MonoInfo").GetComponent<TextMeshProUGUI>();
         startBtn = GameObject.Find("StartButton").GetComponent<Button>();
         startBtn.onClick.AddListener(StartOnClick);
+        startBtnText = GameObject.Find("StartButton").transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         
         m_Dropdown = GameObject.Find("SelectSound").GetComponent<TMP_Dropdown>();
         DropdownInit();
@@ -55,16 +58,18 @@ public class VirtualSourceController : MonoBehaviour
         m_Dropdown.onValueChanged.AddListener(delegate {
             DropdownValueChanged(m_Dropdown);
         });
+        
+        for(int i = 1; i < 10; ++i) {
+            monosPos[i] = GameObject.Find("Mono" + i).GetComponent<RectTransform>().anchoredPosition;
+            Debug.Log(monosPos[i]);
+        }
+        TestPathInit();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(StaticSource || MoveingSource || !hasFirst) startBtn.interactable = false;
-        else startBtn.interactable = true;
-        if(StaticSource){
-            moving += Time.deltaTime;
-        } else if(MoveingSource){
+        if(MoveingSource){
             moving += Time.deltaTime;
             MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(position1, position2, moving / moveTime);
             
@@ -77,11 +82,9 @@ public class VirtualSourceController : MonoBehaviour
             osc.Send(message);   
         }
         if(moving >= moveTime){
-            StaticSource = false;
             MoveingSource = false;
             moving = 0.0f;
-            hasFirst = false;
-            hasSecond = false;
+
             mono1 = "";
             mono2 = "";
 
@@ -92,55 +95,51 @@ public class VirtualSourceController : MonoBehaviour
         }
     }
 
-    public void ChangeSelectedPositon(Vector2 pos, string monoName){
-        if(StaticSource || MoveingSource) return;
-        Debug.Log(mText.text);
-        if(!hasFirst){
-            position1 = pos;
-            mono1 = monoName;
-            hasFirst = true;
-        } else if(!hasSecond){
-            position2 = pos;
-            mono2 = monoName;
-            hasSecond = true;
-        } else {
-            position1 = pos;
-            mono1 = monoName;
-            mono2 = "";
-            position2 = pos;
-            hasFirst = true;
-            hasSecond = false;
-        }
-        mText.text = mono1 + (hasSecond ? " to " + mono2 : "");
-    }
-
     void StartOnClick(){
-        if(StaticSource || MoveingSource) return;
-		if(hasFirst && hasSecond){
-            MoveingSource = true;
-            MovingMono.GetComponent<RectTransform>().anchoredPosition = position1;
-            Debug.Log("start move");
-
-            OscMessage message = new OscMessage();
-            message.address = "/PlaySound";
-            message.values.Add(1); // monoIndex
-            message.values.Add(soundName);
-            message.values.Add(1); // loop
-            osc.Send(message);
-        } else if(hasFirst){
-            StaticSource = true;
-            MovingMono.GetComponent<RectTransform>().anchoredPosition = position1;
-            Debug.Log("start static");
-
-            OscMessage message = new OscMessage();
-            message.address = "/PlaySound";
-            message.values.Add(1); // monoIndex
-            message.values.Add(soundName);
-            message.values.Add(1); // loop
-            osc.Send(message);
+        if(MoveingSource) return;
+        
+        if(currPathIdx == 0){
+            startBtnText.text = "Next";
+        } else if(currPathIdx == 7){
+            startBtnText.text = "Restart";
+        } else if(currPathIdx > 7){
+            mText.text = "Start Test";
+            startBtnText.text = "Start";
+            TestPathInit();
+            return;
         }
-	}
 
+        mText.text = "Test index " + (currPathIdx + 1);
+        position1 = monosPos[pathsIdx[currPathIdx, 0]];
+        position2 = monosPos[pathsIdx[currPathIdx, 1]];
+        Debug.Log("1: " + position1 + ",2: " + position2);
+        MoveingSource = true;
+        MovingMono.GetComponent<RectTransform>().anchoredPosition = position1;
+        Debug.Log("start move");
+
+        OscMessage message = new OscMessage();
+        message.address = "/PlaySound";
+        message.values.Add(1); // monoIndex
+        message.values.Add(soundName);
+        message.values.Add(1); // loop
+        osc.Send(message);
+        ++currPathIdx;
+	}
+    void TestPathInit(){
+        currPathIdx = 0;
+        for (int t = 0; t < 8; ++t){
+            int tmp0 = pathsIdx[t, 0];
+            int tmp1 = pathsIdx[t, 1];
+            int r = Random.Range(t, 8);
+            pathsIdx[t, 0] = pathsIdx[r, 0];
+            pathsIdx[t, 1] = pathsIdx[r, 1];
+            pathsIdx[r, 0] = tmp0;
+            pathsIdx[r, 1] = tmp1;
+        }
+        for (int t = 0; t < 8; ++t){
+            Debug.Log(t+1 + ": (" + pathsIdx[t, 0] + ", " + pathsIdx[t, 1] + ")");
+        }
+    }
     void DropdownInit(){
         m_Dropdown.ClearOptions();
         TMP_Dropdown.OptionData m_NewData;
