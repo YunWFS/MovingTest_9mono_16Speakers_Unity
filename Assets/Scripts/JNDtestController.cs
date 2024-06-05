@@ -3,49 +3,54 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.IO;
 
 public class JNDtestController : MonoBehaviour
 {
     OSC osc;
-    public Vector2 position1;
-    public Vector2 position2;
-    public string mono1;
-    public string mono2;
-    bool hasFirst = false;
-    bool hasSecond = false;
-
-    public bool MoveingSource = false;
-    public bool StaticSource = false;
-
-    string[] sounds = new string[]{"BGM", "Bird"};
+    private Vector2 originPosition;
+    enum playingState {None, Origin, Stop, Moved};
+    playingState currState = playingState.None;
+    private bool isPlaying = false;
+    bool[] TestDir = new bool[15];   // false = left, true = right
+    int[] dist = { 0, 0, 0, 10, 10, 10, 20, 20, 20, 30, 30, 30, 50, 50, 50};
+    private int currTestIdx = 0; 
+    string[] sounds = new string[]{"Bird", "BGM"};
     string soundName = "BGM";
 
-    // public Vector3 MovingPosition;
-
     TextMeshProUGUI mText;
+    
     Button startBtn;
+    TextMeshProUGUI startBtnText;
     TMP_Dropdown m_Dropdown;
 
     GameObject MovingMono;
 
-    float moveTime = 5.0f;
-    float moving = 0.0f;
+    private float playMaxTime;
+    private float stopMaxTime;
+    float[] playTotalMaxTime = new float[3];
+    float playingTime = 0.0f;
+    string path = "Assets/Resources/";
+
+    int round = 0;
     // Start is called before the first frame update
     void Start()
     {
         osc = GameObject.Find("Osc").GetComponent<OSC>();
-        moveTime = 5.0f;
-        hasFirst = false;
-        hasSecond = false;
-        mono1 = "";
-        mono2 = "";
+
         soundName = sounds[1];
-        // MovingPosition = new Vector3(0.0f, 0.0f, 0.0f);
+        playMaxTime = 5.0f;
+        stopMaxTime = 2.0f;
+        
+        round = 0;
+        playingTime = 0.0f;
         MovingMono = GameObject.Find("MovingMono");
         MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, 0.0f);
+        
         mText = GameObject.Find("MonoInfo").GetComponent<TextMeshProUGUI>();
         startBtn = GameObject.Find("StartButton").GetComponent<Button>();
         startBtn.onClick.AddListener(StartOnClick);
+        startBtnText = GameObject.Find("StartButton").transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         
         m_Dropdown = GameObject.Find("SelectSound").GetComponent<TMP_Dropdown>();
         DropdownInit();
@@ -53,92 +58,97 @@ public class JNDtestController : MonoBehaviour
         m_Dropdown.onValueChanged.AddListener(delegate {
             DropdownValueChanged(m_Dropdown);
         });
+        originPosition = GameObject.Find("Mono5").GetComponent<RectTransform>().anchoredPosition;
+        playTotalMaxTime[0] = playMaxTime;
+        playTotalMaxTime[1] = playMaxTime + stopMaxTime;
+        playTotalMaxTime[2] = playMaxTime + playTotalMaxTime[1];
+        TestcaseInit();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(StaticSource || MoveingSource || !hasFirst) startBtn.interactable = false;
-        else startBtn.interactable = true;
-        if(StaticSource){
-            moving += Time.deltaTime;
-        } else if(MoveingSource){
-            moving += Time.deltaTime;
-            MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(position1, position2, moving / moveTime);
-            
-            OscMessage message = new OscMessage();
-            message.address = "/UpdateXYZ";
-            message.values.Add(1); // monoIndex
-            message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.x); // x
-            message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.y); // y
-            message.values.Add(0); // z
-            osc.Send(message);   
+        if(isPlaying){
+            playingTime += Time.deltaTime;
         }
-        if(moving >= moveTime){
-            StaticSource = false;
-            MoveingSource = false;
-            moving = 0.0f;
-            hasFirst = false;
-            hasSecond = false;
-            mono1 = "";
-            mono2 = "";
 
+        if(playingTime >= playTotalMaxTime[0] && currState == playingState.Origin){
+            currState = playingState.Stop;
             OscMessage message = new OscMessage();
             message.address = "/StopSound";
             message.values.Add(1); // monoIndex
             osc.Send(message);
-        }
-    }
+            MovingMono.GetComponent<RectTransform>().anchoredPosition = originPosition + new Vector2(dist[currTestIdx] * (TestDir[currTestIdx]? 1 : -1), 0);
 
-    public void ChangeSelectedPositon(Vector2 pos, string monoName){
-        if(StaticSource || MoveingSource) return;
-        Debug.Log(mText.text);
-        if(!hasFirst){
-            position1 = pos;
-            mono1 = monoName;
-            hasFirst = true;
-        } else if(!hasSecond){
-            position2 = pos;
-            mono2 = monoName;
-            hasSecond = true;
-        } else {
-            position1 = pos;
-            mono1 = monoName;
-            mono2 = "";
-            position2 = pos;
-            hasFirst = true;
-            hasSecond = false;
+        } else if(playingTime >= playTotalMaxTime[1] && currState == playingState.Stop){
+            currState = playingState.Moved;
+            OscMessage message = new OscMessage();
+            message.address = "/PlaySound";
+            message.values.Add(1); // monoIndex
+            message.values.Add(soundName);
+            message.values.Add(1); // loop
+            osc.Send(message);
+
+        } else if(playingTime >= playTotalMaxTime[2] && currState == playingState.Moved){
+            currState = playingState.None;
+            OscMessage message = new OscMessage();
+            message.address = "/StopSound";
+            message.values.Add(1); // monoIndex
+            osc.Send(message);
+            ++currTestIdx;
+            MovingMono.GetComponent<RectTransform>().anchoredPosition = originPosition;
+            playingTime = 0.0f;
+            isPlaying = false;
         }
-        mText.text = mono1 + (hasSecond ? " to " + mono2 : "");
     }
 
     void StartOnClick(){
-        if(StaticSource || MoveingSource) return;
-		if(hasFirst && hasSecond){
-            MoveingSource = true;
-            MovingMono.GetComponent<RectTransform>().anchoredPosition = position1;
-            Debug.Log("start move");
-
-            OscMessage message = new OscMessage();
-            message.address = "/PlaySound";
-            message.values.Add(1); // monoIndex
-            message.values.Add(soundName);
-            message.values.Add(1); // loop
-            osc.Send(message);
-        } else if(hasFirst){
-            StaticSource = true;
-            MovingMono.GetComponent<RectTransform>().anchoredPosition = position1;
-            Debug.Log("start static");
-
-            OscMessage message = new OscMessage();
-            message.address = "/PlaySound";
-            message.values.Add(1); // monoIndex
-            message.values.Add(soundName);
-            message.values.Add(1); // loop
-            osc.Send(message);
+        if(isPlaying) return;
+        
+        if(currTestIdx == 0){
+            startBtnText.text = "Next";
+        } else if(currTestIdx == 14){
+            startBtnText.text = "Restart";
+        } else if(currTestIdx > 14){
+            mText.text = "Start Test";
+            startBtnText.text = "Start";
+            TestcaseInit();
+            return;
         }
-	}
 
+        mText.text = "Test index " + (currTestIdx + 1);
+        MovingMono.GetComponent<RectTransform>().anchoredPosition = originPosition;
+
+        OscMessage message = new OscMessage();
+        message.address = "/PlaySound";
+        message.values.Add(1); // monoIndex
+        message.values.Add(soundName);
+        message.values.Add(1); // loop
+        osc.Send(message);
+
+        isPlaying = true;
+        currState = playingState.Origin;
+	}
+    void TestcaseInit(){
+        currTestIdx = 0;
+        for (int t = 0; t < 15; ++t){
+            int tmp = dist[t];
+            int r = Random.Range(t, 15);
+            dist[t] = dist[r];
+            dist[r] = tmp;
+            TestDir[t] = Random.Range(0, 2) == 1 ? true : false;
+        }
+        StreamWriter writer = new StreamWriter(path + "test.txt", true);
+        
+        ++round; 
+        writer.WriteLine("\nTest Case " + round + "\n");
+            
+        for (int t = 0; t < 15; ++t){
+            Debug.Log(t+1 + ": (" + dist[t] + ", " + TestDir[t] + ")");
+            writer.WriteLine(t+1 + ": (" + dist[t] + ", " + TestDir[t] + ")");
+        }
+        writer.Close();
+    }
     void DropdownInit(){
         m_Dropdown.ClearOptions();
         TMP_Dropdown.OptionData m_NewData;
