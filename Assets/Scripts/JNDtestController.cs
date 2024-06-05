@@ -138,14 +138,14 @@ public class JNDtestController : MonoBehaviour
             dist[r] = tmp;
             TestDir[t] = Random.Range(0, 2) == 1 ? true : false;
         }
-        StreamWriter writer = new StreamWriter(path + "test.txt", true);
+        StreamWriter writer = new StreamWriter(path + "JNDtestV1.txt", true);
         
         ++round; 
         writer.WriteLine("\nTest Case " + round + "\n");
             
         for (int t = 0; t < 15; ++t){
-            Debug.Log(t+1 + ": (" + dist[t] + ", " + TestDir[t] + ")");
-            writer.WriteLine(t+1 + ": (" + dist[t] + ", " + TestDir[t] + ")");
+            Debug.Log(t+1 + ": (" + dist[t] + ", " + (TestDir[t] ? "right" : "left") + ")");
+            writer.WriteLine(t+1 + ": (" + dist[t] + ", " + (TestDir[t] ? "right" : "left") + ")");
         }
         writer.Close();
     }
