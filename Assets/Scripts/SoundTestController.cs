@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.IO;
 
 public class SoundTestController : MonoBehaviour
 {
@@ -35,6 +36,8 @@ public class SoundTestController : MonoBehaviour
 
     float moveTime = 5.0f;
     float moving = 0.0f;
+    string path = "Assets/Resources/";
+    int round = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -61,7 +64,7 @@ public class SoundTestController : MonoBehaviour
         
         for(int i = 1; i < 10; ++i) {
             monosPos[i] = GameObject.Find("Mono" + i).GetComponent<RectTransform>().anchoredPosition;
-            Debug.Log(monosPos[i]);
+            // Debug.Log(monosPos[i]);
         }
         TestPathInit();
     }
@@ -112,7 +115,7 @@ public class SoundTestController : MonoBehaviour
         mText.text = "Test index " + (currPathIdx + 1);
         position1 = monosPos[pathsIdx[currPathIdx, 0]];
         position2 = monosPos[pathsIdx[currPathIdx, 1]];
-        Debug.Log("1: " + position1 + ",2: " + position2);
+        // Debug.Log("1: " + position1 + ",2: " + position2);
         MoveingSource = true;
         MovingMono.GetComponent<RectTransform>().anchoredPosition = position1;
         Debug.Log("start move");
@@ -136,9 +139,15 @@ public class SoundTestController : MonoBehaviour
             pathsIdx[r, 0] = tmp0;
             pathsIdx[r, 1] = tmp1;
         }
+        StreamWriter writer = new StreamWriter(path + "SoundTest.txt", true);
+        ++round;
+        writer.WriteLine("\nTest Case " + round + "\n");
+
         for (int t = 0; t < 8; ++t){
-            Debug.Log(t+1 + ": (" + pathsIdx[t, 0] + ", " + pathsIdx[t, 1] + ")");
+            Debug.Log((t+1) + ": (" + pathsIdx[t, 0] + ", " + pathsIdx[t, 1] + ")");
+            writer.WriteLine((t+1) + ": (" + pathsIdx[t, 0] + ", " + pathsIdx[t, 1] + ")");
         }
+        writer.Close();
     }
     void DropdownInit(){
         m_Dropdown.ClearOptions();
