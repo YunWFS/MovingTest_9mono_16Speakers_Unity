@@ -21,7 +21,11 @@ public class SoundTestController : MonoBehaviour
     Vector2[,] pathsPos;
     private int currPathIdx = 0; 
     Vector2[] monosPos = new Vector2[10];    
-    string[] sounds = new string[]{"Bird", "BGM"};
+    string[] sounds = new string[]{"Bird", "BGM", 
+                                    "Violin", "Piccolo", "Oboe", "CorAnglais", "Clarinet", 
+                                    "Saxophone", "Trumpet", "Harp", "Castanets", "Triangles",
+                                    "Glockenspiel", "GrandPiano", "Harpsichord", "Celesta", "FemaleSpeech",
+                                    "MaleSpeech", "Piano"};
     string soundName = "BGM";
 
     // public Vector3 MovingPosition;
@@ -34,7 +38,7 @@ public class SoundTestController : MonoBehaviour
 
     GameObject MovingMono;
 
-    float moveTime = 5.0f;
+    float moveTime;
     float moving = 0.0f;
     string path = "Assets/Resources/";
     int round = 0;
@@ -42,7 +46,8 @@ public class SoundTestController : MonoBehaviour
     void Start()
     {
         osc = GameObject.Find("Osc").GetComponent<OSC>();
-        moveTime = 1.0f;
+        moveTime = 8.0f;
+        moving = 0.0f;
         mono1 = "";
         mono2 = "";
         soundName = sounds[1];
@@ -66,7 +71,8 @@ public class SoundTestController : MonoBehaviour
             monosPos[i] = GameObject.Find("Mono" + i).GetComponent<RectTransform>().anchoredPosition;
             // Debug.Log(monosPos[i]);
         }
-        TestPathInit();
+        currPathIdx = 8;
+        // TestPathInit();
     }
 
     // Update is called once per frame
@@ -141,7 +147,7 @@ public class SoundTestController : MonoBehaviour
         }
         StreamWriter writer = new StreamWriter(path + "SoundTest.txt", true);
         ++round;
-        writer.WriteLine("\nTest Case " + round + "\n");
+        writer.WriteLine("\nTest Case " + round + ", sound: " + soundName + "\n");
 
         for (int t = 0; t < 8; ++t){
             Debug.Log((t+1) + ": (" + pathsIdx[t, 0] + ", " + pathsIdx[t, 1] + ")");
