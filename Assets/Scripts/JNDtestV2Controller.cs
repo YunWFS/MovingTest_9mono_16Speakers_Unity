@@ -85,6 +85,14 @@ public class JNDtestV2Controller : MonoBehaviour
             osc.Send(message);
             MovingMono.GetComponent<RectTransform>().anchoredPosition = originPosition + new Vector2(dist[round] * (TestDir[currTestDir]? 1 : -1), 0);
 
+            message = new OscMessage();
+            message.address = "/UpdateXYZ";
+            message.values.Add(1); // monoIndex
+            message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.x); // x
+            message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.y); // y
+            message.values.Add(0); // z
+            osc.Send(message); 
+
         } else if(playingTime >= playTotalMaxTime[1] && currState == playingState.Stop){
             currState = playingState.Moved;
             OscMessage message = new OscMessage();
@@ -101,7 +109,16 @@ public class JNDtestV2Controller : MonoBehaviour
             message.values.Add(1); // monoIndex
             osc.Send(message);
             ++currTestDir;
+            
             MovingMono.GetComponent<RectTransform>().anchoredPosition = originPosition;
+            message = new OscMessage();
+            message.address = "/UpdateXYZ";
+            message.values.Add(1); // monoIndex
+            message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.x); // x
+            message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.y); // y
+            message.values.Add(0); // z
+            osc.Send(message); 
+
             playingTime = 0.0f;
             isPlaying = false;
         }
@@ -131,6 +148,14 @@ public class JNDtestV2Controller : MonoBehaviour
         message.values.Add(soundName);
         message.values.Add(1); // loop
         osc.Send(message);
+
+        message = new OscMessage();
+        message.address = "/UpdateXYZ";
+        message.values.Add(1); // monoIndex
+        message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.x); // x
+        message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.y); // y
+        message.values.Add(0); // z
+        osc.Send(message); 
 
         isPlaying = true;
         currState = playingState.Origin;
