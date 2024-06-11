@@ -17,7 +17,11 @@ public class JNDtestV2Controller : MonoBehaviour
     int[] dist = { 80, 60, 40, 30, 20, 10};
     private int currTestDir = 0; 
     private int round = 0;
-    string[] sounds = new string[]{"Bird", "BGM"};
+    string[] sounds = new string[]{"Bird", "BGM", 
+                                    "Violin", "Piccolo", "Oboe", "CorAnglais", "Clarinet", 
+                                    "Saxophone", "Trumpet", "Harp", "Castanets", "Triangles",
+                                    "Glockenspiel", "GrandPiano", "Harpsichord", "Celesta", "FemaleSpeech",
+                                    "MaleSpeech", "Piano"};
     string soundName = "BGM";
 
     TextMeshProUGUI mText;
@@ -143,19 +147,19 @@ public class JNDtestV2Controller : MonoBehaviour
         MovingMono.GetComponent<RectTransform>().anchoredPosition = originPosition;
 
         OscMessage message = new OscMessage();
-        message.address = "/PlaySound";
-        message.values.Add(1); // monoIndex
-        message.values.Add(soundName);
-        message.values.Add(1); // loop
-        osc.Send(message);
-
-        message = new OscMessage();
         message.address = "/UpdateXYZ";
         message.values.Add(1); // monoIndex
         message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.x); // x
         message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.y); // y
         message.values.Add(0); // z
         osc.Send(message); 
+
+        message = new OscMessage();
+        message.address = "/PlaySound";
+        message.values.Add(1); // monoIndex
+        message.values.Add(soundName);
+        message.values.Add(1); // loop
+        osc.Send(message);
 
         isPlaying = true;
         currState = playingState.Origin;
