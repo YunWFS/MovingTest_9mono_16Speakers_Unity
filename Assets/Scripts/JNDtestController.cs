@@ -15,7 +15,7 @@ public class JNDtestController : MonoBehaviour
     bool[] TestDir = new bool[15];   // false = left, true = right
     int[] dist = { 0, 0, 0, 10, 10, 10, 20, 20, 20, 30, 30, 30, 50, 50, 50};
     private int currTestIdx = 0; 
-    string[] sounds = new string[]{"Bird", "BGM", 
+    string[] sounds = new string[]{"Bird", "BGM", "EX",
                                     "Violin", "Piccolo", "Oboe", "CorAnglais", "Clarinet", 
                                     "Saxophone", "Trumpet", "Harp", "Castanets", "Triangles",
                                     "Glockenspiel", "GrandPiano", "Harpsichord", "Celesta", "FemaleSpeech",
@@ -43,7 +43,7 @@ public class JNDtestController : MonoBehaviour
         osc = GameObject.Find("Osc").GetComponent<OSC>();
 
         soundName = sounds[1];
-        playMaxTime = 5.0f;
+        playMaxTime = 8.0f;
         stopMaxTime = 2.0f;
         
         round = 0;
