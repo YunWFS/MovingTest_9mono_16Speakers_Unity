@@ -21,11 +21,15 @@ public class SoundTestController : MonoBehaviour
     Vector2[,] pathsPos;
     private int currPathIdx = 0; 
     Vector2[] monosPos = new Vector2[10];    
-    string[] sounds = new string[]{"Bird", "BGM", 
+    string[] sounds = new string[]{"Bird",
                                     "Violin", "Piccolo", "Oboe", "CorAnglais", "Clarinet", 
-                                    "Saxophone", "Trumpet", "Harp", "Castanets", "Triangles",
-                                    "Glockenspiel", "GrandPiano", "Harpsichord", "Celesta", "FemaleSpeech",
-                                    "MaleSpeech", "Piano"};
+                                    "Castanets", "Glockenspiel", "FemaleSpeech", "MaleSpeech", "Piano"};
+                                    
+                                    // {"Bird", "BGM", 
+                                    // "Violin", "Piccolo", "Oboe", "CorAnglais", "Clarinet", 
+                                    // "Saxophone", "Trumpet", "Harp", "Castanets", "Triangles",
+                                    // "Glockenspiel", "GrandPiano", "Harpsichord", "Celesta", "FemaleSpeech",
+                                    // "MaleSpeech", "Piano"};
     string soundName = "BGM";
 
     // public Vector3 MovingPosition;
