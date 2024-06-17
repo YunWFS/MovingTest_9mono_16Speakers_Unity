@@ -66,7 +66,26 @@ public class VirtualSourceController : MonoBehaviour
             moving += Time.deltaTime;
         } else if(MoveingSource){
             moving += Time.deltaTime;
-            MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(position1, position2, moving / moveTime);
+            if(mono1 == "Mono1" && mono2 == "Mono3"){
+                float ang = Mathf.PI * 1 / 3 * (2 - moving / moveTime);
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(50 * Mathf.Cos(ang), 50 * Mathf.Sin(ang));
+            } else if(mono1 == "Mono3" && mono2 == "Mono1"){
+                float ang = Mathf.PI * 1 / 3 * (1 + moving / moveTime);
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(50 * Mathf.Cos(ang), 50 * Mathf.Sin(ang));
+            } else if(mono1 == "Mono4" && mono2 == "Mono6"){
+                float ang = Mathf.PI * 1 / 3 * (2 - moving / moveTime);
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(100 * Mathf.Cos(ang), 100 * Mathf.Sin(ang));
+            } else if(mono1 == "Mono6" && mono2 == "Mono4"){
+                float ang = Mathf.PI * 1 / 3 * (1 + moving / moveTime);
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(100 * Mathf.Cos(ang), 100 * Mathf.Sin(ang));
+            } else if(mono1 == "Mono7" && mono2 == "Mono9"){
+                float ang = Mathf.PI * 1 / 3 * (2 - moving / moveTime);
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(150 * Mathf.Cos(ang), 150 * Mathf.Sin(ang));
+            } else if(mono1 == "Mono9" && mono2 == "Mono7"){
+                float ang = Mathf.PI * 1 / 3 * (1 + moving / moveTime);
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(150 * Mathf.Cos(ang), 150 * Mathf.Sin(ang));
+            } else 
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(position1, position2, moving / moveTime);
             
             OscMessage message = new OscMessage();
             message.address = "/UpdateXYZ";
