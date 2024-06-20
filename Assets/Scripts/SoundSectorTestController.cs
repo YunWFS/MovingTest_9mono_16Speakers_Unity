@@ -117,7 +117,7 @@ public class SoundSectorTestController : MonoBehaviour
                         break;
                     case 9:
                         ang = Mathf.PI * 1 / 3 * (1 + moving / moveTime);
-                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(150 * Mathf.Cos(ang), 150 * Mathf.Sin(ang));
+                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(radius * 3 * Mathf.Cos(ang), radius * 3 * Mathf.Sin(ang));
                         break;
                 }
                 
