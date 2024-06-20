@@ -172,8 +172,15 @@ public class JND9testController : MonoBehaviour
 
         mText.text = "Test dist " + currDist + ", test dir " + currDir + ", test pos " + currPos + " test case " + (currTestMoved + 1);
         MovingMono.GetComponent<RectTransform>().anchoredPosition = monosPos[currPos];
-
         OscMessage message = new OscMessage();
+        message.address = "/UpdateXYZ";
+        message.values.Add(1); // monoIndex
+        message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.x); // x
+        message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.y); // y
+        message.values.Add(0); // z
+        osc.Send(message); 
+
+        message = new OscMessage();
         message.address = "/PlaySound";
         message.values.Add(1); // monoIndex
         message.values.Add(soundName);
