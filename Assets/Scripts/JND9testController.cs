@@ -158,6 +158,7 @@ public class JND9testController : MonoBehaviour
     void StartOnClick(){
         if(isPlaying) return;
         
+        dir = Random.Range(0, 2) >= 1 ? true : false;
         if(currTestMoved == 0){
             startBtnText.text = "Next";
         } else if(currTestMoved == testPerDist-1){
