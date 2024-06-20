@@ -10,18 +10,21 @@ public class JND9testController : MonoBehaviour
     OSC osc;
     private Vector2 originPosition;
     private Vector2 frontPos, backPos;
+    private Vector2 leftPos, rightPos;
     enum playingState {None, Origin, Stop, Moved};
     private bool isPlaying = false;
     private int testPerDist;
     bool[] Moved = {false, false, false, false, false, true, true, true, true, true,};   // false = left, true = right
     int[] posList = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    int[] dist = {50, 45, 40, 35, 30, 25, 20, 15, 10, 5};
+    int[] dist = {30, 25, 20, 15, 10, 9, 8, 7, 6, 5};
+    string[] dir2 = {"left-right", "front-back"};
     private int currTestMoved = 0; 
-    string[] sounds = new string[]{"Bird", "BGM", 
+    string[] sounds = new string[]{"Bird", 
                                     "FemaleSpeech",
                                     "MaleSpeech"};
     string soundName = "BGM";
     int currDist;
+    string currDir;
     int currPos;
 
     TextMeshProUGUI mText;
@@ -31,6 +34,7 @@ public class JND9testController : MonoBehaviour
     TMP_Dropdown m_Dropdown;
     TMP_Dropdown SelectPos_Dropdown;
     TMP_Dropdown SelectDist_Dropdown;
+    TMP_Dropdown SelectDir_Dropdown;
 
     GameObject MovingMono;
     Vector2[] monosPos = new Vector2[10];   
@@ -50,8 +54,8 @@ public class JND9testController : MonoBehaviour
 
         soundName = sounds[1];
         playMaxTime = 8.0f;
-        movePathTime = 1.0f;
-        currChangeTime = 1.0f;
+        movePathTime = 4.0f;
+        currChangeTime = movePathTime;
         // stopMaxTime = 1.0f;
         
         testPerDist = 10;
@@ -67,6 +71,7 @@ public class JND9testController : MonoBehaviour
         m_Dropdown = GameObject.Find("SelectSound").GetComponent<TMP_Dropdown>();
         SelectPos_Dropdown = GameObject.Find("SelectPos").GetComponent<TMP_Dropdown>();
         SelectDist_Dropdown = GameObject.Find("SelectDist").GetComponent<TMP_Dropdown>();
+        SelectDir_Dropdown = GameObject.Find("SelectDir").GetComponent<TMP_Dropdown>();
         DropdownInit();
         m_Dropdown.value = 1;
         m_Dropdown.onValueChanged.AddListener(delegate {
@@ -79,6 +84,13 @@ public class JND9testController : MonoBehaviour
             DropdownValueChangedDist(SelectDist_Dropdown);
         });
         currDist = dist[1];
+
+        DropdownInitDir();
+        SelectDir_Dropdown.value = 1;
+        SelectDir_Dropdown.onValueChanged.AddListener(delegate {
+            DropdownValueChangedDir(SelectDir_Dropdown);
+        });
+        currDir = dir2[1];
 
         DropdownInitPos();
         SelectPos_Dropdown.value = 1;
@@ -94,6 +106,8 @@ public class JND9testController : MonoBehaviour
         originPosition = monosPos[currPos];
         frontPos = new Vector2(originPosition.x, originPosition.y - currDist);
         backPos = new Vector2(originPosition.x, originPosition.y + currDist);
+        leftPos = new Vector2(originPosition.x - currDist, originPosition.y);
+        rightPos = new Vector2(originPosition.x + currDist, originPosition.y);
         // currState = playingState.None;
         currTestMoved = testPerDist;
         TestcaseInit();
@@ -125,9 +139,11 @@ public class JND9testController : MonoBehaviour
             }
             
             if(dir){
-                MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(frontPos, backPos, (currChangeTime - playingTime) / movePathTime);
+                if(currDir == "left-right") MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(leftPos, rightPos, (currChangeTime - playingTime) / movePathTime);
+                else MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(frontPos, backPos, (currChangeTime - playingTime) / movePathTime);
             } else {
-                MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(backPos, frontPos, (currChangeTime - playingTime) / movePathTime);
+                if(currDir == "left-right") MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(rightPos, leftPos, (currChangeTime - playingTime) / movePathTime);
+                else MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(backPos, frontPos, (currChangeTime - playingTime) / movePathTime);
             } 
             OscMessage message = new OscMessage();
             message.address = "/UpdateXYZ";
@@ -154,7 +170,7 @@ public class JND9testController : MonoBehaviour
             return;
         }
 
-        mText.text = "Test dist " + currDist +  ", test pos " + currPos + " test case " + (currTestMoved + 1);
+        mText.text = "Test dist " + currDist + ", test dir " + currDir + ", test pos " + currPos + " test case " + (currTestMoved + 1);
         MovingMono.GetComponent<RectTransform>().anchoredPosition = monosPos[currPos];
 
         OscMessage message = new OscMessage();
@@ -181,9 +197,11 @@ public class JND9testController : MonoBehaviour
         originPosition = monosPos[currPos];
         frontPos = new Vector2(originPosition.x, originPosition.y - currDist);
         backPos = new Vector2(originPosition.x, originPosition.y + currDist);
+        leftPos = new Vector2(originPosition.x - currDist, originPosition.y);
+        rightPos = new Vector2(originPosition.x + currDist, originPosition.y);
         StreamWriter writer = new StreamWriter(path + "JND9test.txt", true);
         
-        writer.WriteLine("\nPos" + currPos + ", Dist: " + currDist + "\n");
+        writer.WriteLine("\nPos" + currPos + ", Dist: " + currDist + ", Direction: " + currDir + "\n");
             
         for (int t = 0; t < testPerDist; ++t){
             Debug.Log("Dist " + currDist + ", Pos" + currPos + ", testcase " + (t+1) + ": " + (Moved[t] ? "moving" : "static"));
@@ -261,6 +279,31 @@ public class JND9testController : MonoBehaviour
     void DropdownValueChangedDist(TMP_Dropdown change)
     {
         currDist = dist[change.value];
+        TestcaseInit();
+    }
+
+    void DropdownInitDir(){
+        // Debug.Log("DropdownInitDir");
+        SelectDir_Dropdown.ClearOptions();
+        TMP_Dropdown.OptionData m_NewData;
+        List<TMP_Dropdown.OptionData> m_Messages = new List<TMP_Dropdown.OptionData>();
+
+        foreach(string d in dir2){
+            m_NewData = new TMP_Dropdown.OptionData();
+            m_NewData.text = d.ToString();
+            m_Messages.Add(m_NewData);
+        }
+        //Take each entry in the message List
+        foreach (TMP_Dropdown.OptionData message in m_Messages)
+        {
+            //Add each entry to the Dropdown
+            SelectDir_Dropdown.options.Add(message);
+            //Make the index equal to the total number of entries
+        }
+    }
+    void DropdownValueChangedDir(TMP_Dropdown change)
+    {
+        currDir = dir2[change.value];
         TestcaseInit();
     }
 }

@@ -17,6 +17,8 @@ public class SoundSectorTestController : MonoBehaviour
 
     // int pathsIdx = new int[12, 2]{{ 1, 3}, { 3, 1}, { 4, 6},{ 6, 4}, { 7, 9}, { 9, 7}, 
     int numOfPath = 12;
+
+    int radius;
     int[,] pathsIdx;
     //  = new int[12, 2]{{ 1, 3}, { 3, 1}, { 4, 6},{ 6, 4}, { 7, 9}, { 9, 7}, 
     //                                  { 1, 7}, { 7, 1}, { 2, 8}, { 8, 2}, { 3, 9}, { 9, 3}};
@@ -78,6 +80,7 @@ public class SoundSectorTestController : MonoBehaviour
             // Debug.Log(monosPos[i]);
         }
         numOfPath = 12;
+        radius = 60;
         pathsIdx = new int[12, 2]{{ 1, 3}, { 3, 1}, { 4, 6},{ 6, 4}, { 7, 9}, { 9, 7}, 
                                      { 1, 7}, { 7, 1}, { 2, 8}, { 8, 2}, { 3, 9}, { 9, 3}};
         currPathIdx = numOfPath;
@@ -94,23 +97,23 @@ public class SoundSectorTestController : MonoBehaviour
                 switch(pathsIdx[currPathIdx-1, 0]){
                     case 1:
                         ang = Mathf.PI * 1 / 3 * (2 - moving / moveTime);
-                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(50 * Mathf.Cos(ang), 50 * Mathf.Sin(ang));
+                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(radius * Mathf.Cos(ang), radius * Mathf.Sin(ang));
                         break;
                     case 3:
                         ang = Mathf.PI * 1 / 3 * (1 + moving / moveTime);
-                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(50 * Mathf.Cos(ang), 50 * Mathf.Sin(ang));
+                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(radius * Mathf.Cos(ang), radius * Mathf.Sin(ang));
                         break;
                     case 4:
                         ang = Mathf.PI * 1 / 3 * (2 - moving / moveTime);
-                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(100 * Mathf.Cos(ang), 100 * Mathf.Sin(ang));
+                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(radius * 2 * Mathf.Cos(ang), radius * 2 * Mathf.Sin(ang));
                         break;
                     case 6:
                         ang = Mathf.PI * 1 / 3 * (1 + moving / moveTime);
-                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(100 * Mathf.Cos(ang), 100 * Mathf.Sin(ang));
+                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(radius * 2 * Mathf.Cos(ang), radius * 2 * Mathf.Sin(ang));
                         break;
                     case 7:
                         ang = Mathf.PI * 1 / 3 * (2 - moving / moveTime);
-                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(150 * Mathf.Cos(ang), 150 * Mathf.Sin(ang));
+                        MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(radius * 3 * Mathf.Cos(ang), radius * 3 * Mathf.Sin(ang));
                         break;
                     case 9:
                         ang = Mathf.PI * 1 / 3 * (1 + moving / moveTime);
