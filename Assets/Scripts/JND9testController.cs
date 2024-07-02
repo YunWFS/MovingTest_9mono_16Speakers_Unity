@@ -16,7 +16,7 @@ public class JND9testController : MonoBehaviour
     private int testPerDist;
     bool[] Moved = {false, false, false, false, false, true, true, true, true, true,};   // false = left, true = right
     int[] posList = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    int[] dist = {30, 25, 20, 15, 10, 9, 8, 7, 6, 5};
+    int[] dist = {50, 40, 30, 25, 20, 15, 10, 9, 8, 7, 6, 5};
     string[] dir2 = {"left-right", "front-back"};
     private int currTestMoved = 0; 
     string[] sounds = new string[]{"Bird", 
@@ -93,11 +93,11 @@ public class JND9testController : MonoBehaviour
         currDir = dir2[1];
 
         DropdownInitPos();
-        SelectPos_Dropdown.value = 1;
+        SelectPos_Dropdown.value = 4;
         SelectPos_Dropdown.onValueChanged.AddListener(delegate {
             DropdownValueChangedPos(SelectPos_Dropdown);
         });
-        currPos = posList[1];
+        currPos = posList[4];
 
         for(int i = 1; i < 10; ++i) {
             monosPos[i] = GameObject.Find("Mono" + i).GetComponent<RectTransform>().anchoredPosition;
