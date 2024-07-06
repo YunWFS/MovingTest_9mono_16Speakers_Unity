@@ -16,14 +16,14 @@ public class JND9testController : MonoBehaviour
     private int testPerDist;
     bool[] Moved = {false, false, false, false, false, true, true, true, true, true,};   // false = left, true = right
     int[] posList = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    int[] dist = {50, 40, 30, 25, 20, 15, 10, 9, 8, 7, 6, 5};
+    float[] dist = {50f, 30f, 25f, 20f, 15f, 10f, 5f, 2.5f, 1f};
     string[] dir2 = {"left-right", "front-back"};
     private int currTestMoved = 0; 
     string[] sounds = new string[]{"Bird", 
                                     "FemaleSpeech",
                                     "MaleSpeech"};
     string soundName = "BGM";
-    int currDist;
+    float currDist;
     string currDir;
     int currPos;
 
@@ -271,7 +271,7 @@ public class JND9testController : MonoBehaviour
         TMP_Dropdown.OptionData m_NewData;
         List<TMP_Dropdown.OptionData> m_Messages = new List<TMP_Dropdown.OptionData>();
 
-        foreach(int d in dist){
+        foreach(float d in dist){
             m_NewData = new TMP_Dropdown.OptionData();
             m_NewData.text = d.ToString();
             m_Messages.Add(m_NewData);
