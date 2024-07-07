@@ -19,15 +19,17 @@ public class SoundSectorTestController : MonoBehaviour
     int numOfPath = 12;
 
     int radius;
-    int[,] pathsIdx;
+    int[] pathsIdx;
+    int[,] pathsToMove;
     //  = new int[12, 2]{{ 1, 3}, { 3, 1}, { 4, 6},{ 6, 4}, { 7, 9}, { 9, 7}, 
     //                                  { 1, 7}, { 7, 1}, { 2, 8}, { 8, 2}, { 3, 9}, { 9, 3}};
     // Vector2[,] pathsPos;
     private int currPathIdx = 0; 
     Vector2[] monosPos = new Vector2[10];    
-    string[] sounds = new string[]{"Bird",
-                                    "Violin", "Piccolo", "Oboe", "CorAnglais", "Clarinet", 
-                                    "Castanets", "Glockenspiel", "FemaleSpeech", "MaleSpeech", "Piano"};
+    string[] sounds = new string[] {"Bird", "FemaleSpeech", "MaleSpeech"};
+                                //    {"Bird",
+                                //     "Violin", "Piccolo", "Oboe", "CorAnglais", "Clarinet", 
+                                //     "Castanets", "Glockenspiel", "FemaleSpeech", "MaleSpeech", "Piano"};
                                     
                                     // {"Bird", "BGM", 
                                     // "Violin", "Piccolo", "Oboe", "CorAnglais", "Clarinet", 
@@ -81,7 +83,8 @@ public class SoundSectorTestController : MonoBehaviour
         }
         numOfPath = 12;
         radius = 60;
-        pathsIdx = new int[12, 2]{{ 1, 3}, { 3, 1}, { 4, 6},{ 6, 4}, { 7, 9}, { 9, 7}, 
+        pathsIdx = new int[12]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+        pathsToMove = new int[12, 2]{{ 1, 3}, { 3, 1}, { 4, 6},{ 6, 4}, { 7, 9}, { 9, 7}, 
                                      { 1, 7}, { 7, 1}, { 2, 8}, { 8, 2}, { 3, 9}, { 9, 3}};
         currPathIdx = numOfPath;
         // TestPathInit();
@@ -92,9 +95,9 @@ public class SoundSectorTestController : MonoBehaviour
     {
         if(MoveingSource){
             moving += Time.deltaTime;
-            if(Mathf.Abs(pathsIdx[currPathIdx-1, 0] - pathsIdx[currPathIdx-1, 1]) == 2){
+            if(Mathf.Abs(pathsToMove[pathsIdx[currPathIdx-1], 0] - pathsToMove[pathsIdx[currPathIdx-1], 1]) == 2){
                 float ang;
-                switch(pathsIdx[currPathIdx-1, 0]){
+                switch(pathsToMove[pathsIdx[currPathIdx-1], 0]){
                     case 1:
                         ang = Mathf.PI * 1 / 3 * (2 - moving / moveTime);
                         MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(radius * Mathf.Cos(ang), radius * Mathf.Sin(ang));
@@ -160,8 +163,8 @@ public class SoundSectorTestController : MonoBehaviour
         }
 
         mText.text = "Test index " + (currPathIdx + 1);
-        position1 = monosPos[pathsIdx[currPathIdx, 0]];
-        position2 = monosPos[pathsIdx[currPathIdx, 1]];
+        position1 = monosPos[pathsToMove[pathsIdx[currPathIdx], 0]];
+        position2 = monosPos[pathsToMove[pathsIdx[currPathIdx], 1]];
         // Debug.Log("1: " + position1 + ",2: " + position2);
         MoveingSource = true;
         MovingMono.GetComponent<RectTransform>().anchoredPosition = position1;
@@ -178,21 +181,21 @@ public class SoundSectorTestController : MonoBehaviour
     void TestPathInit(){
         currPathIdx = 0;
         for (int t = 0; t < numOfPath; ++t){
-            int tmp0 = pathsIdx[t, 0];
-            int tmp1 = pathsIdx[t, 1];
+            int tmp = pathsIdx[t];
+            // int tmp1 = pathsIdx[t, 1];
             int r = Random.Range(t, numOfPath);
-            pathsIdx[t, 0] = pathsIdx[r, 0];
-            pathsIdx[t, 1] = pathsIdx[r, 1];
-            pathsIdx[r, 0] = tmp0;
-            pathsIdx[r, 1] = tmp1;
+            pathsIdx[t] = pathsIdx[r];
+            // pathsIdx[t, 1] = pathsIdx[r, 1];
+            pathsIdx[r] = tmp;
+            // pathsIdx[r, 1] = tmp1;
         }
         StreamWriter writer = new StreamWriter(path + "SoundSectorTest.txt", true);
         ++round;
         writer.WriteLine("\nTest Case " + round + ", sound: " + soundName + "\n");
 
         for (int t = 0; t < numOfPath; ++t){
-            Debug.Log((t+1) + ": (" + pathsIdx[t, 0] + ", " + pathsIdx[t, 1] + ")");
-            writer.WriteLine((t+1) + ": (" + pathsIdx[t, 0] + ", " + pathsIdx[t, 1] + ")");
+            Debug.Log((t+1) + ": path" + (pathsIdx[t]+1) + " (" + pathsToMove[pathsIdx[t], 0] + ", " + pathsToMove[pathsIdx[t], 1] + ")");
+            writer.WriteLine((t+1) + ": path" + (pathsIdx[t]+1) + " (" + pathsToMove[pathsIdx[t], 0] + ", " + pathsToMove[pathsIdx[t], 1] + ")");
         }
         writer.Close();
     }
