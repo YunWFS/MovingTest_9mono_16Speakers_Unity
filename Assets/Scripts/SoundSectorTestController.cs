@@ -16,7 +16,7 @@ public class SoundSectorTestController : MonoBehaviour
     public bool MoveingSource = false;
 
     // int pathsIdx = new int[12, 2]{{ 1, 3}, { 3, 1}, { 4, 6},{ 6, 4}, { 7, 9}, { 9, 7}, 
-    int numOfPath = 12;
+    int numOfPath;
 
     int radius;
     int[] pathsIdx;
@@ -81,9 +81,9 @@ public class SoundSectorTestController : MonoBehaviour
             monosPos[i] = GameObject.Find("Mono" + i).GetComponent<RectTransform>().anchoredPosition;
             // Debug.Log(monosPos[i]);
         }
-        numOfPath = 12;
+        numOfPath = 24;
         radius = 60;
-        pathsIdx = new int[12]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+        pathsIdx = new int[24]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
         pathsToMove = new int[12, 2]{{ 1, 3}, { 3, 1}, { 4, 6},{ 6, 4}, { 7, 9}, { 9, 7}, 
                                      { 1, 7}, { 7, 1}, { 2, 8}, { 8, 2}, { 3, 9}, { 9, 3}};
         currPathIdx = numOfPath;
