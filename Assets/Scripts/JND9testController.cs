@@ -16,8 +16,8 @@ public class JND9testController : MonoBehaviour
     private int testPerDist;
     bool[] Moved = {false, false, false, false, false, true, true, true, true, true,};   // false = left, true = right
     int[] posList = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    float[] dist = {50f, 30f, 25f, 20f, 15f, 10f, 5f, 2.5f, 1f};
-    string[] dir2 = {"left-right", "front-back"};
+    float[] dist = {50f, 30f, 25f, 20f, 15f, 10f, 5f, 3f, 1f};
+    string[] dir2 = {"front-back", "left-right"};
     private int currTestMoved = 0; 
     string[] sounds = new string[]{"Bird", 
                                     "FemaleSpeech",
@@ -54,8 +54,8 @@ public class JND9testController : MonoBehaviour
 
         soundName = sounds[1];
         playMaxTime = 8.0f;
-        movePathTime = 4.0f;
-        currChangeTime = movePathTime;
+        movePathTime = 1.0f;
+        currChangeTime = movePathTime / 2;
         // stopMaxTime = 1.0f;
         
         testPerDist = 10;
@@ -79,11 +79,11 @@ public class JND9testController : MonoBehaviour
         });
 
         DropdownInitDist();
-        SelectDist_Dropdown.value = 1;
+        SelectDist_Dropdown.value = 3;
         SelectDist_Dropdown.onValueChanged.AddListener(delegate {
             DropdownValueChangedDist(SelectDist_Dropdown);
         });
-        currDist = dist[1];
+        currDist = dist[3];
 
         DropdownInitDir();
         SelectDir_Dropdown.value = 1;
@@ -126,7 +126,7 @@ public class JND9testController : MonoBehaviour
             osc.Send(message);
             MovingMono.GetComponent<RectTransform>().anchoredPosition = originPosition;
             playingTime = 0.0f;
-            currChangeTime = movePathTime;
+            currChangeTime = movePathTime / 2;
             isPlaying = false;
             ++currTestMoved;
             m_Dropdown.enabled = true;
