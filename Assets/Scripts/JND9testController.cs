@@ -54,7 +54,7 @@ public class JND9testController : MonoBehaviour
 
         soundName = sounds[1];
         playMaxTime = 8.0f;
-        movePathTime = 1.0f;
+        movePathTime = 2.0f;
         currChangeTime = movePathTime / 2;
         // stopMaxTime = 1.0f;
         
