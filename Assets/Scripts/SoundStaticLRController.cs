@@ -12,7 +12,7 @@ public class SoundStaticLRController : MonoBehaviour
     public string mono;
 
     public bool MoveingSource = false;
-    int[] posIdx = new int[11]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    int[] posIdx = new int[22]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
     private int currPosIdx = 0; 
     Vector2[] monosPos = new Vector2[12];    
     string[] sounds = new string[]{"Bird", "FemaleSpeech", "MaleSpeech"};
@@ -61,7 +61,7 @@ public class SoundStaticLRController : MonoBehaviour
             monosPos[i] = GameObject.Find("Mono" + i).GetComponent<RectTransform>().anchoredPosition;
             // Debug.Log(monosPos[i]);
         }
-        currPosIdx = 12;
+        currPosIdx = posIdx.Length;
         // TestPathInit();
     }
 
@@ -97,9 +97,9 @@ public class SoundStaticLRController : MonoBehaviour
         
         if(currPosIdx == 0){
             startBtnText.text = "Next";
-        } else if(currPosIdx == 10){
+        } else if(currPosIdx == posIdx.Length -1){
             startBtnText.text = "Restart";
-        } else if(currPosIdx > 10){
+        } else if(currPosIdx > posIdx.Length -1){
             mText.text = "Start Test";
             startBtnText.text = "Start";
             TestPathInit();
@@ -130,9 +130,9 @@ public class SoundStaticLRController : MonoBehaviour
 	}
     void TestPathInit(){
         currPosIdx = 0;
-        for (int t = 0; t < 11; ++t){
+        for (int t = 0; t < posIdx.Length; ++t){
             int tmp = posIdx[t];
-            int r = Random.Range(t, 11);
+            int r = Random.Range(t, posIdx.Length);
             posIdx[t] = posIdx[r];
             posIdx[r] = tmp;
         }
@@ -140,7 +140,7 @@ public class SoundStaticLRController : MonoBehaviour
         ++round;
         writer.WriteLine("\nLeft-Right Test Case " + round + ", sound: " + soundName + "\n");
 
-        for (int t = 0; t < 11; ++t){
+        for (int t = 0; t < posIdx.Length; ++t){
             Debug.Log("Test Case " + (t+1) + ": pos" + posIdx[t]);
             writer.WriteLine((t+1) + ": pos" + posIdx[t]);
         }
