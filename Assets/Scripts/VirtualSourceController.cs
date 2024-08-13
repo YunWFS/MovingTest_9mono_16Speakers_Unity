@@ -19,7 +19,7 @@ public class VirtualSourceController : MonoBehaviour
     public bool MoveingSource = false;
     public bool StaticSource = false;
 
-    string[] sounds = new string[]{"BGM", "Bird"};
+    string[] sounds = new string[]{"BGM", "Bird", "FemaleSpeech", "MaleSpeech"};
     string soundName = "BGM";
 
     // public Vector3 MovingPosition;
@@ -30,13 +30,13 @@ public class VirtualSourceController : MonoBehaviour
 
     GameObject MovingMono;
 
-    float moveTime = 5.0f;
+    float moveTime = 8.0f;
     float moving = 0.0f;
     // Start is called before the first frame update
     void Start()
     {
         osc = GameObject.Find("Osc").GetComponent<OSC>();
-        moveTime = 5.0f;
+        moveTime = 8.0f;
         hasFirst = false;
         hasSecond = false;
         mono1 = "";
@@ -68,22 +68,22 @@ public class VirtualSourceController : MonoBehaviour
             moving += Time.deltaTime;
             if(mono1 == "Mono1" && mono2 == "Mono3"){
                 float ang = Mathf.PI * 1 / 3 * (2 - moving / moveTime);
-                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(50 * Mathf.Cos(ang), 50 * Mathf.Sin(ang));
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(60 * Mathf.Cos(ang), 60 * Mathf.Sin(ang));
             } else if(mono1 == "Mono3" && mono2 == "Mono1"){
                 float ang = Mathf.PI * 1 / 3 * (1 + moving / moveTime);
-                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(50 * Mathf.Cos(ang), 50 * Mathf.Sin(ang));
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(60 * Mathf.Cos(ang), 60 * Mathf.Sin(ang));
             } else if(mono1 == "Mono4" && mono2 == "Mono6"){
                 float ang = Mathf.PI * 1 / 3 * (2 - moving / moveTime);
-                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(100 * Mathf.Cos(ang), 100 * Mathf.Sin(ang));
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(120 * Mathf.Cos(ang), 120 * Mathf.Sin(ang));
             } else if(mono1 == "Mono6" && mono2 == "Mono4"){
                 float ang = Mathf.PI * 1 / 3 * (1 + moving / moveTime);
-                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(100 * Mathf.Cos(ang), 100 * Mathf.Sin(ang));
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(120 * Mathf.Cos(ang), 120 * Mathf.Sin(ang));
             } else if(mono1 == "Mono7" && mono2 == "Mono9"){
                 float ang = Mathf.PI * 1 / 3 * (2 - moving / moveTime);
-                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(150 * Mathf.Cos(ang), 150 * Mathf.Sin(ang));
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(180 * Mathf.Cos(ang), 180 * Mathf.Sin(ang));
             } else if(mono1 == "Mono9" && mono2 == "Mono7"){
                 float ang = Mathf.PI * 1 / 3 * (1 + moving / moveTime);
-                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(150 * Mathf.Cos(ang), 150 * Mathf.Sin(ang));
+                MovingMono.GetComponent<RectTransform>().anchoredPosition = new Vector2(180 * Mathf.Cos(ang), 180 * Mathf.Sin(ang));
             } else 
                 MovingMono.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(position1, position2, moving / moveTime);
             
@@ -139,8 +139,15 @@ public class VirtualSourceController : MonoBehaviour
             MoveingSource = true;
             MovingMono.GetComponent<RectTransform>().anchoredPosition = position1;
             Debug.Log("start move");
-
             OscMessage message = new OscMessage();
+            message.address = "/UpdateXYZ";
+            message.values.Add(1); // monoIndex
+            message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.x); // x
+            message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.y); // y
+            message.values.Add(0); // z
+            osc.Send(message);
+            
+            message = new OscMessage();
             message.address = "/PlaySound";
             message.values.Add(1); // monoIndex
             message.values.Add(soundName);
@@ -150,8 +157,16 @@ public class VirtualSourceController : MonoBehaviour
             StaticSource = true;
             MovingMono.GetComponent<RectTransform>().anchoredPosition = position1;
             Debug.Log("start static");
-
+            
             OscMessage message = new OscMessage();
+            message.address = "/UpdateXYZ";
+            message.values.Add(1); // monoIndex
+            message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.x); // x
+            message.values.Add(MovingMono.GetComponent<RectTransform>().anchoredPosition.y); // y
+            message.values.Add(0); // z
+            osc.Send(message);
+
+            message = new OscMessage();
             message.address = "/PlaySound";
             message.values.Add(1); // monoIndex
             message.values.Add(soundName);
